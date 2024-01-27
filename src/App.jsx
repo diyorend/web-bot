@@ -2,7 +2,7 @@ import "./App.css";
 import Card from "./components/Card/card";
 import { getData } from "./constants/db";
 import Cart from "./components/Cart/cart";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const movies = getData();
 
@@ -52,10 +52,21 @@ const App = () => {
     };
 
     const onCheckout = () => {
+        // if (cartItems.length === 0) {
+        //     telegram.MainButton.hide();
+        // }
         telegram.MainButton.text = "Sotib olish";
         telegram.MainButton.show();
     };
 
+    const onSendData = useCallback(() => {
+        telegram.sendData(JSON.stringify(cartItems));
+    }, [cartItems]);
+
+    useEffect(() => {
+        telegram.onEvent("mainButtonClicked", onSendData);
+        return () => telegram.offEvent("mainButtonClicked", onSendData);
+    }, [onSendData]);
     return (
         <>
             <h1 className="heading">Sammi Kinolar</h1>
